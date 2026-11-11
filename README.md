@@ -1,7 +1,6 @@
 # Cox-Regression: Merkmale ohne Form – Streamlit-Demo
 
-<!-- TODO nach dem Deploy: direkt hierher den Live-Link setzen (Leerzeile davor und danach):
-**[→ Demo live ausprobieren](https://sebastianhanisch-cox-regression-demo.streamlit.app/)** -->
+**[→ Demo live ausprobieren](https://sebastianhanisch-cox-regression-demo.streamlit.app/)**
 
 Teil der Linie **Überlebenszeit** (Zeit bis zum Ereignis bei Beobachtungen, die irgendwann abbrechen) in der „Konzepte“-Reihe für die Website „Sebastian Hanisch – Operations Research und Machine Learning“.
 Der Aufhänger ist die Abholung von Containern: Ein **Merkmal** eines Containers verändert die Abholrate; die **Cox-Regression** schätzt das Verhältnis, mit dem es sie vervielfacht,
@@ -25,7 +24,7 @@ aus der Zensierung, nicht aus der Regression an sich.
 Rate eines Containers mit Merkmal $x$: $h(t \mid x) = h_0(t)\,e^{\beta x}$ mit unbekannter Grundrate $h_0$. Die simulierte Welt hat eine Weibull-Grundrate (Form $k$, Skala 8 Tage), ein
 standardnormalverteiltes Merkmal und eine Zensierzeit, die zwischen 0 und dem Beobachtungsfenster gleichverteilt und von Merkmal und Abholzeit unabhängig ist. Die partielle Likelihood, Score,
 Information, der Newton-Schritt, die Breslow-Grundrate und die Wahrheit der Regression (−β/k bei Daten ohne Zensierung) stehen im Expander „📐 Mathematische Formulierung“ der App, mit Lesehilfe und
-Symboltabelle. Gleichstände der Zeiten behandelt der Kern nach Breslow. Der Kern (`cxr_core.py`) ist eine Kopie aus der Linien-Vorlage (`ueberlebenszeit-planung/kern/uz_core.py`, Stand 2026-11-10):
+Symboltabelle. Gleichstände der Zeiten behandelt der Kern nach Breslow. Der Kern (`cxr_core.py`) ist eine Kopie des gemeinsamen Kerns `uz_core.py` der Überlebenszeit-Linie (Stand 2026-11-10):
 SplitMix64-Zufall, Eingabeprüfung, Kaplan–Meier und Cox mit Newton-Schrittweitenhalbierung und Konvergenzflag.
 
 ## Methodik
@@ -140,7 +139,7 @@ Ein zweites Handbeispiel mit Gleichstand (Zeiten 1, 1, 2, 3, Merkmal 1, 0, 1, 0)
 | Messung 1 bis 6 (alle Tabellen und Prosa-Zahlen oben) | eingefroren in `tools/measure_cox_result.json`; `tests/test_claims.py` vergleicht jede Tabelle wörtlich und rechnet die Zellen Standardwelt, Seed 1, n = 10, n = 50, Fenster 4, Fenster 1000, Form 2,5, β = 0, Experiment 3 (n = 300) und das Handbeispiel neu (Band 1e-6) |
 | Stabilität über Zufalls-Seeds 2 bis 5, n = 20, 100, 600, Fenster 6, 8, 20, 40, 100, Form 1,0, Experiment 3 bei n = 100 | nur eingefroren, nicht im Test neu gerechnet |
 
-**Vormessung zum Vergleich** (Wegwerf-Skript mit numpy-Zufall, `ueberlebenszeit-planung/vormessung/out_uz_v1_bis_v8.txt` V6 und `out_uz_v20_bis_v23.txt` V20b, 200 Läufe): Cox β̂ 0,71 ± 0,01, Regression
+**Erste Messung zum Vergleich** (vor dem Bau der Demo mit einem einfachen Skript gemessen, NumPy-Zufall, 200 Läufe): Cox β̂ 0,71 ± 0,01, Regression
 −0,21 (alle) und −0,21 (nur Ereignisse) gegen −0,467, 55 % zensiert; Überdeckung 98,5 % (n = 50), 94,5 % (n = 100), 93,5 % (n = 300). Die Werte dieser Demo weichen zufallsbedingt ab (anderer Zufallsgenerator).
 
 ## Ehrliche Grenzen
@@ -172,23 +171,22 @@ Ein zweites Handbeispiel mit Gleichstand (Zeiten 1, 1, 2, 3, Merkmal 1, 0, 1, 0)
 - Das Konvergenzflag des Kerns allein reicht nicht: Bei einem einzigen Ereignis (Merkmal des Abgeholten ist das größte seiner Risikomenge) meldete eine frühere Fassung des kopierten Kerns Konvergenz mit β̂ = 16,4 und
   Standardfehler rund 9,5·10^7. Die aktuelle Kopie `cxr_core.py` fängt das mit einer Plausibilitätsgrenze (Standardfehler über 50 oder |β̂| über 20 gilt als verkappte Trennung) ab und meldet `ok = False`. Der Wrapper `fit_cox` erkennt die perfekte Trennung unabhängig davon vorab (`tests/test_oracle_cox.py`).
 
-## Befunde und Korrekturen gegenüber dem Plan
+## Befunde und Korrekturen gegenüber der ersten Messung
 
-Plan: `ueberlebenszeit-planung/PLAN-04-cox-regression.md`.
+Die erste Messung ist ein einfaches Skript, das vor dem Bau der Demo lief (NumPy-Zufall, 200 Läufe); die Demo selbst rechnet mit SplitMix64. Dieser Abschnitt nennt, wo die Demo von der ersten Messung und der ursprünglichen Erwartung abweicht.
 
-- **Zahlen:** Plan 0,71 ± 0,01 und 55 % zensiert (numpy-Zufall), hier 0,703 ± 0,007 und 54,4 % (SplitMix64); die Regression bleibt bei −0,21 gegen −0,47. Es gilt die Zahl dieser Demo.
-- **Überdeckung (Plan: V20b):** Der Plan nennt 98,5 / 94,5 / 93,5 % bei n = 50 / 100 / 300 und schließt „bei n = 50 etwas zu weit“. Hier: 191 / 189 / 193 von 200 (95,5 / 94,5 / 96,5 %); über sechs
+- **Zahlen:** erste Messung 0,71 ± 0,01 und 55 % zensiert (NumPy-Zufall), hier 0,703 ± 0,007 und 54,4 % (SplitMix64); die Regression bleibt bei −0,21 gegen −0,47. Es gilt die Zahl dieser Demo.
+- **Überdeckung:** Die erste Messung nannte 98,5 / 94,5 / 93,5 % bei n = 50 / 100 / 300 und schloss „bei n = 50 etwas zu weit“. Hier: 191 / 189 / 193 von 200 (95,5 / 94,5 / 96,5 %); über sechs
   Zufalls-Seeds bei n = 300 liegt der Anteil zwischen 92,0 und 96,5 %. Die Aussage „bei n = 50 zu weit“ bestätigt sich nicht; die Schwankung der Anteile ist so groß wie die Unterschiede.
-- **Kleines n:** Neu gegenüber dem Plan: Überschätzung bei n = 10 und 20 und Läufe ohne Schätzer bei n = 10 (Tabelle oben). Der Plan nannte nur die leichte Überschätzung 0,71 bis 0,73 bei n = 50 bis 300.
-- **Konvergenzflag:** Der Plan verlangt Flag und Meldung statt des Wegwerf-Codes (z. B. β̂ = 31,9 bei Trennung). Umgesetzt für Trennung, Information 0 und fehlendes Ereignis; dazu der oben beschriebene Fund,
-  dass eine frühere Fassung des kopierten Kerns bei einem einzigen Ereignis trotzdem „konvergiert“ meldete; die aktuelle Kopie `cxr_core.py` enthält dafür eine Plausibilitätsgrenze. Ob die Vorlage `uz_core.py` sie ebenfalls enthält, ist hier nicht geprüft.
-- **Experiment 4 (Gleichstände):** wie im Plan vorgesehen nicht umgesetzt, da Breslow gegen Efron nicht gemessen ist; die App und diese README nennen dazu keine Zahl.
-- **Z2 (zwei vorberechnete Merkmale):** nicht umgesetzt, nur ein Merkmal live (siehe „Bewusst nicht umgesetzt“).
-- **Experiment 3:** Der Plan nennt „KM-Kurven der Gruppen“. Umgesetzt mit Terzil-Gruppen des Merkmals und der Cox-Kurve als Mittel über die Mitglieder (nicht die Kurve beim mittleren Merkmal), dazu das
+- **Kleines n:** Neu gegenüber der ersten Messung: Überschätzung bei n = 10 und 20 und Läufe ohne Schätzer bei n = 10 (Tabelle oben). Die erste Messung nannte nur die leichte Überschätzung 0,71 bis 0,73 bei n = 50 bis 300.
+- **Konvergenzflag:** Das einfache Skript der ersten Messung gab bei Trennung eine Zahl zurück (z. B. β̂ = 31,9); die Demo gibt Flag und Meldung aus. Umgesetzt für Trennung, Information 0 und fehlendes Ereignis; dazu der oben beschriebene Fund,
+  dass eine frühere Fassung des kopierten Kerns bei einem einzigen Ereignis trotzdem „konvergiert“ meldete; die aktuelle Kopie `cxr_core.py` enthält dafür eine Plausibilitätsgrenze. Ob der gemeinsame Kern `uz_core.py` sie ebenfalls enthält, ist hier nicht geprüft.
+- **Experiment 4 (Gleichstände):** bewusst nicht umgesetzt, da Breslow gegen Efron nicht gemessen ist; die App und diese README nennen dazu keine Zahl.
+- **Zwei weitere, vorberechnete Merkmale:** nicht umgesetzt, nur ein Merkmal live (siehe „Bewusst nicht umgesetzt“).
+- **Experiment 3:** Ursprünglich gedacht waren Kaplan–Meier-Kurven der Gruppen. Umgesetzt mit Terzil-Gruppen des Merkmals und der Cox-Kurve als Mittel über die Mitglieder (nicht die Kurve beim mittleren Merkmal), dazu das
   Verdikt mit Zahlen gegen Kaplan–Meier und Wahrheit.
-- **Regression „nur Ereignisse“** steht zusätzlich zu „alle“ in der Demo (wie im Plan, V6); beide liegen bei Fenster 12 bei 44 % und 46 % der Wahrheit.
-- **Kein PDF-Export** (der Auftrag der Linie verlangt ihn nicht; die App zeigt alle Zahlen auf der Seite).
-- **Footer:** Die Linie Überlebenszeit hat noch keine Konzepte-Spezifikation; der Footer verweist deshalb auf `demos.html` und ist vor der Website-Einbindung auf die Linie umzustellen.
+- **Regression „nur Ereignisse“** steht zusätzlich zu „alle“ in der Demo (wie schon in der ersten Messung); beide liegen bei Fenster 12 bei 44 % und 46 % der Wahrheit.
+- **Kein PDF-Export:** Die App zeigt alle Zahlen auf der Seite.
 
 ## Tests
 
@@ -216,7 +214,7 @@ Der Orakel-Test braucht SciPy (`requirements-dev.txt`, nicht in der Laufzeit); f
 | `.gitignore` | venv, Caches, Streamlit-Secrets |
 | `.streamlit/config.toml` | Streamlit-Einstellungen (keine Nutzungsstatistik) |
 | `app.py` | Streamlit-App: drei Experimente, Kernfrage, Annahmen, Formeln |
-| `cxr_core.py` | Kopie aus `ueberlebenszeit-planung/kern/uz_core.py` (SplitMix64, Eingabeprüfung, Kaplan–Meier, Cox mit Konvergenzflag); wird nicht verändert |
+| `cxr_core.py` | Kopie des gemeinsamen Kerns `uz_core.py` der Überlebenszeit-Linie (Stand 2026-11-10; SplitMix64, Eingabeprüfung, Kaplan–Meier, Cox mit Konvergenzflag); wird nicht verändert |
 | `cxr_model.py` | partielle Log-Likelihood, Score, Information, Newton-Pfad, Trennungserkennung, `fit_cox` mit Status, Breslow-Grundrate, Gruppenkurven, Simulationsstudie |
 | `cxr_scenario.py` | Welt (Weibull-Grundrate, Merkmal, Zensierung), Simulation je Lauf, Muster des Handbeispiels |
 | `cxr_evaluation.py` | Zahlenformat, Auswertung der drei Experimente, Verdikte als reine Funktionen |
@@ -231,7 +229,7 @@ Der Orakel-Test braucht SciPy (`requirements-dev.txt`, nicht in der Laufzeit); f
 ## Bewusst nicht umgesetzt
 
 - **Efron-Gleichstandsbehandlung** und jeder Vergleich Breslow gegen Efron (nicht gemessen).
-- **Zweites Merkmal, Merkmalsauswahl, nichtlineare Wirkung:** nur ein Merkmal live; die Plan-Entscheidung Z2 (zwei weitere Merkmale vorberechnet) ist nicht gebaut.
+- **Zweites Merkmal, Merkmalsauswahl, nichtlineare Wirkung:** nur ein Merkmal live; zwei weitere, vorberechnete Merkmale sind nicht gebaut.
 - **Prüfung der Proportionalität, abhängige Zensierung, verzögerter Eintritt:** eigene Fragen der Linie Überlebenszeit, hier nicht gemessen. Der kopierte Kern kann Eintritt (`entry`), die App nutzt es nicht.
 - **Vergleich mit Lernverfahren** (zum Beispiel Überlebenswäldern): nicht Teil dieser Demo.
 - **PDF-Export.**
@@ -259,4 +257,4 @@ Gebaut mit Streamlit, Plotly und NumPy; Orakel-Tests mit SciPy.
 
 ---
 
-Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zu den Demos: [Interaktive Demos](https://sebastianhanisch.net/demos.html).
+Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zur Reihe: [Überlebenszeit: zensierte Zeiten lesen](https://sebastianhanisch.net/konzepte-ueberlebenszeit.html).

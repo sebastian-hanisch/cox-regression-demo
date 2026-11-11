@@ -1,4 +1,4 @@
-"""Kopie aus ueberlebenszeit-planung/kern/uz_core.py, Stand 2026-11-10 (nur die Funktionen dieser Demo; der Rest ist gelöscht).
+"""Kopie des gemeinsamen Kerns uz_core.py der Überlebenszeit-Linie, Stand 2026-11-10 (nur die Funktionen dieser Demo; der Rest ist gelöscht).
 
 Enthalten: SplitMix64 (Zufall), SurvivalError und check_data (Eingabeprüfung), Kaplan–Meier mit Eintritt (für die Gruppenkurven in
 Experiment 3) und Cox-Partial-Likelihood nach Breslow mit Eintritt, Konvergenzflag und Meldung bei perfekter Trennung und Singularität.
